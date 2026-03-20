@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LicitaControl</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f9;--surface:#fff;--surface2:#f0f2f6;--border:#e3e7ef;--border2:#d0d7e3;
+  --text:#1a1d26;--text2:#5a6275;--text3:#9ba3b4;
+  --accent:#1a6ef5;--accent-bg:#eef4ff;--accent-bd:#c7dafe;
+  --red:#dc3545;--red-bg:#fff5f5;--red-bd:#fcc;
+  --orange:#e07c3a;--orange-bg:#fff8f3;--orange-bd:#fdd9c0;
+  --yellow:#b8860b;--yellow-bg:#fffdf0;--yellow-bd:#fde8a0;
+  --green:#1a8a52;--green-bg:#f2fbf6;--green-bd:#b6e8d0;
+  --sh:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 16px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:var(--sh);gap:10px}
+.logo{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;display:flex;align-items:center;gap:8px;flex-shrink:0;letter-spacing:-.3px}
+.logo-i{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px}
+.logo span{color:var(--accent)}
+.hright{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.badge{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text3);padding:4px 10px;border:1px solid var(--border);border-radius:20px;background:var(--surface2);font-weight:500;white-space:nowrap}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--text3)}
+.dot.g{background:#1a8a52;box-shadow:0 0 0 2px #b6e8d0}
+.dot.b{background:var(--accent);box-shadow:0 0 0 2px var(--accent-bd)}
+.btn{padding:6px 13px;border-radius:7px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);font-family:'Inter',sans-serif;font-size:12.5px;font-weight:500;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;box-shadow:var(--sh)}
+.btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.btna{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;box-shadow:0 2px 6px rgba(26,110,245,.3)}
+.btna:hover{background:#1457cc;color:#fff;border-color:#1457cc}
+.btnb{background:var(--accent-bg);color:var(--accent);border-color:var(--accent-bd);box-shadow:none}
+.btnb:hover{background:#ddeaff}
+.btno{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd);box-shadow:none}
+.btno:hover{background:#ffeedd}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* WRAP */
+.wrap{max-width:1360px;margin:0 auto;padding:20px 24px}
+
+/* SETUP */
+.setup-center{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 56px);padding:20px}
+.setup-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:38px;width:490px;max-width:100%;box-shadow:var(--sh2)}
+.setup-box h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:5px;letter-spacing:-.5px}
+.setup-box .sub{color:var(--text2);font-size:13px;line-height:1.7;margin-bottom:22px}
+.info-box{background:var(--accent-bg);border:1px solid var(--accent-bd);border-radius:8px;padding:14px 16px;font-size:12.5px;color:#2a4a8a;line-height:1.9;margin-bottom:22px}
+.info-box strong{color:var(--accent);font-weight:600}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
+.field label{font-size:12px;font-weight:600;color:var(--text2);letter-spacing:.1px}
+.field input,.field textarea,.field select{background:var(--surface);border:1px solid var(--border2);border-radius:7px;padding:9px 12px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12.5px;outline:none;transition:all .15s;width:100%}
+.field input:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.field textarea{resize:vertical;min-height:90px;line-height:1.65}
+.field small{color:var(--text3);font-size:11px;line-height:1.5}
+
+/* ALERT BANNER */
+.abanner{display:flex;align-items:center;gap:10px;padding:11px 16px;background:var(--red-bg);border:1px solid var(--red-bd);border-radius:8px;margin-bottom:18px;font-size:13px;color:#7a1010}
+.abanner strong{color:var(--red)}
+.abanner .grow{flex:1;line-height:1.5}
+
+/* SYNCBAR */
+.syncbar{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:12.5px;color:var(--text2);margin-bottom:18px;box-shadow:var(--sh);flex-wrap:wrap}
+.syncbar .g{flex:1;min-width:80px}
+.mono{font-family:'IBM Plex Mono',monospace;color:var(--text3)}
+
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.filter-bar h2{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;letter-spacing:-.3px;margin-right:4px}
+.fbtns{display:flex;gap:5px;flex-wrap:wrap}
+.fb{padding:5px 13px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px;box-shadow:var(--sh);white-space:nowrap}
+.fb:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.fb.on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;box-shadow:0 2px 6px rgba(26,110,245,.2)}
+.fb .cnt{background:rgba(255,255,255,.25);border-radius:10px;padding:0 6px;font-size:11px;font-weight:700}
+.fb:not(.on) .cnt{background:var(--surface2);color:var(--text3)}
+.ml{margin-left:auto}
+.sw{position:relative}
+.sw input{background:var(--surface);border:1px solid var(--border2);border-radius:7px;padding:7px 12px 7px 30px;color:var(--text);font-size:12.5px;outline:none;width:200px;transition:all .15s;box-shadow:var(--sh)}
+.sw input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.sw::before{content:'⌕';position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:15px;color:var(--text3);pointer-events:none}
+
+/* VIEW TOGGLE */
+.view-toggle{display:flex;border:1px solid var(--border2);border-radius:7px;overflow:hidden;box-shadow:var(--sh)}
+.vt{padding:6px 10px;background:var(--surface);color:var(--text3);cursor:pointer;font-size:14px;transition:all .15s;border:none}
+.vt:hover{background:var(--accent-bg);color:var(--accent)}
+.vt.on{background:var(--accent);color:#fff}
+
+/* STATS ROW */
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px}
+@media(max-width:900px){.stats{grid-template-columns:repeat(3,1fr)}}
+.sc{padding:14px 16px;border-radius:10px;border:1px solid var(--border);background:var(--surface);cursor:pointer;transition:all .15s;box-shadow:var(--sh);position:relative;overflow:hidden}
+.sc:hover{transform:translateY(-1px);box-shadow:var(--sh2)}
+.sc .sl{font-size:10.5px;color:var(--text3);font-weight:600;margin-bottom:6px;letter-spacing:.3px}
+.sc .sn{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;line-height:1;letter-spacing:-1px}
+.sc .ss{font-size:10.5px;color:var(--text3);margin-top:3px}
+.sc .bar{position:absolute;bottom:0;left:0;right:0;height:3px}
+.adot{position:absolute;top:10px;right:10px;width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
+.sv{border-color:var(--red-bd);background:var(--red-bg)}.sv .sn{color:var(--red)}.sv .bar{background:var(--red)}
+.su{border-color:var(--orange-bd);background:var(--orange-bg)}.su .sn{color:var(--orange)}.su .bar{background:var(--orange)}
+.sa{border-color:var(--yellow-bd);background:var(--yellow-bg)}.sa .sn{color:var(--yellow)}.sa .bar{background:var(--yellow)}
+.so{border-color:var(--green-bd);background:var(--green-bg)}.so .sn{color:var(--green)}.so .bar{background:var(--green)}
+.sne{border-color:#e0d0f0;background:#fdf8ff}.sne .sn{color:#8040c0}.sne .bar{background:#8040c0}
+.st .sn{color:var(--accent)}.st .bar{background:var(--accent)}
+
+/* CARDS GRID */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:16px 18px;box-shadow:var(--sh);transition:all .15s;cursor:pointer;position:relative;display:flex;flex-direction:column;gap:0}
+.card:hover{transform:translateY(-2px);box-shadow:var(--sh2);border-color:var(--border2)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px}
+.card-badges{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:12px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.tv{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd)}
+.tu{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-bd)}
+.ta{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-bd)}
+.to{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd)}
+.tn{background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
+.pipe-tag{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:4px;background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-bd)}
+.card-menu{color:var(--text3);cursor:pointer;font-size:18px;line-height:1;padding:2px 6px;border-radius:5px;transition:all .15s;flex-shrink:0;border:none;background:none}
+.card-menu:hover{background:var(--surface2);color:var(--text)}
+.card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;line-height:1.3;margin-bottom:4px;letter-spacing:-.2px}
+.card-num{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--accent);font-weight:500;margin-bottom:10px}
+.divider{height:1px;background:var(--border);margin:10px 0}
+.card-row{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text2);margin-bottom:6px}
+.card-row:last-child{margin-bottom:0}
+.card-row .icon{width:16px;flex-shrink:0;text-align:center;font-size:13px}
+.card-row .val{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.card-row .val.bold{font-weight:600;color:var(--text)}
+.card-row .val.mono{font-family:'IBM Plex Mono',monospace;font-size:12px}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:8px;flex-wrap:wrap}
+.card-date{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
+.card-actions{display:flex;gap:6px}
+.nbtn{padding:5px 10px;border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid var(--accent-bd);background:var(--accent-bg);color:var(--accent);display:inline-flex;align-items:center;gap:4px}
+.nbtn:hover{background:#ddeaff;border-color:var(--accent)}
+.nbtn.sent{border-color:var(--green-bd);background:var(--green-bg);color:var(--green)}
+.pdl{padding:5px 10px;border-radius:6px;background:var(--surface2);color:var(--text2);text-decoration:none;font-size:11.5px;font-weight:500;border:1px solid var(--border);transition:all .15s;display:inline-flex;align-items:center;gap:4px}
+.pdl:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.progress-strip{height:3px;background:var(--border);border-radius:2px;margin:10px 0 2px;overflow:hidden}
+.progress-strip-fill{height:100%;border-radius:2px}
+.no-email-badge{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:4px;background:#fdf8ff;color:#8040c0;border:1px solid #e0d0f0}
+
+/* TABLE */
+.tw{border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--sh)}
+table{width:100%;border-collapse:collapse;background:var(--surface)}
+thead th{background:var(--surface2);padding:9px 14px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s;cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--surface2)}
+td{padding:11px 14px;vertical-align:middle}
+
+/* EMPTY */
+.empty{text-align:center;padding:70px 20px;color:var(--text3)}
+.empty .ei{font-size:44px;margin-bottom:14px}
+.empty h3{font-family:'Syne',sans-serif;font-size:15px;color:var(--text2);margin-bottom:6px;font-weight:700}
+.empty p{font-size:13px;line-height:1.7}
+.spin{width:13px;height:13px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .6s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* MODAL */
+.ov{position:fixed;inset:0;background:rgba(20,30,60,.3);backdrop-filter:blur(5px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.ov.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;width:560px;max-width:100%;max-height:90vh;overflow-y:auto;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.12)}
+.modal h2{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;margin-bottom:4px;letter-spacing:-.4px}
+.modal .msub{color:var(--text2);font-size:13px;margin-bottom:20px;line-height:1.5}
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tab{padding:8px 15px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.tab:hover{color:var(--text2)}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.tab-panel{display:none}.tab-panel.on{display:block}
+.sec-title{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin:18px 0 10px}
+.email-preview{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:11.5px;color:var(--text2);line-height:1.9;margin:8px 0;font-family:'IBM Plex Mono',monospace;white-space:pre-wrap;max-height:180px;overflow-y:auto}
+.deal-check-list{display:flex;flex-direction:column;gap:6px;max-height:240px;overflow-y:auto;margin-bottom:12px}
+.dchk{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:7px;background:var(--surface2);border:1px solid var(--border);transition:background .1s}
+.dchk:hover{background:var(--accent-bg)}
+.dchk input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;flex-shrink:0;cursor:pointer}
+.dchk-info{flex:1;min-width:0}
+.dchk-title{font-size:12.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dchk-sub{font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace;margin-top:2px}
+.pbar{height:6px;border-radius:3px;background:var(--border);margin:12px 0 4px;overflow:hidden}
+.pfill{height:100%;border-radius:3px;background:var(--accent);transition:width .4s}
+.slog{display:flex;flex-direction:column;gap:4px;max-height:140px;overflow-y:auto;margin-top:8px}
+.li{font-size:11px;font-family:'IBM Plex Mono',monospace;padding:5px 9px;border-radius:5px;border:1px solid var(--border)}
+.li-ok{background:var(--green-bg);color:var(--green);border-color:var(--green-bd)}
+.li-err{background:var(--red-bg);color:var(--red);border-color:var(--red-bd)}
+.li-skip{background:var(--surface2);color:var(--text3)}
+.divhr{height:1px;background:var(--border);margin:16px 0}
+
+/* TOASTS */
+.toasts{position:fixed;bottom:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{padding:11px 15px;border-radius:9px;background:var(--surface);border:1px solid var(--border);font-size:13px;max-width:340px;animation:ti .2s ease;pointer-events:all;line-height:1.4;box-shadow:var(--sh2);font-weight:500}
+@keyframes ti{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><div class="logo-i">📋</div>Licita<span>Control</span></div>
+  <div class="hright">
+    <div class="badge"><div class="dot" id="cdot"></div><span id="ctext">Desconectado</span></div>
+    <div class="badge"><div class="dot" id="edot"></div><span id="etext">E-mail não config.</span></div>
+    <button class="btn" onclick="openCfg('pd')">⚙ Config</button>
+    <button class="btn btnb" id="notifyAllBtn" onclick="openNotifyModal()" style="display:none">🔔 Notificar Urgentes</button>
+    <button class="btn btna" id="syncBtn" onclick="loadDeals()">⟳ Sincronizar</button>
+  </div>
+</header>
+
+<!-- CONFIG MODAL -->
+<div class="ov" id="cfgModal">
+  <div class="modal">
+    <h2>⚙ Configurações</h2>
+    <div class="tabs">
+      <div class="tab on" onclick="stab('pd')" id="tab-pd">🔗 Pipedrive</div>
+      <div class="tab" onclick="stab('email')" id="tab-email">✉ E-mail</div>
+      <div class="tab" onclick="stab('txt')" id="tab-txt">📝 Textos</div>
+    </div>
+
+    <!-- PIPEDRIVE -->
+    <div class="tab-panel on" id="panel-pd">
+      <div class="info-box">
+        <strong>Lê de cada Deal:</strong><br>
+        📅 Data prevista de fechamento (🚩) → vencimento<br>
+        📋 Final do título → nº contrato (ex: SRP 19/2025)<br>
+        📧 Pessoa vinculada → e-mail do cliente<br>
+        💰 Valor do negócio
+      </div>
+      <div class="field">
+        <label>🔑 API Token</label>
+        <input type="password" id="cfgTok" placeholder="seu token..."/>
+        <small>Pipedrive → ⚙ Configurações pessoais → API</small>
+      </div>
+      <button class="btn btna" onclick="doConnect()" style="width:100%;justify-content:center;margin-top:8px">✓ Conectar</button>
+      <div id="cfgMsg" style="font-size:12px;text-align:center;margin-top:10px;min-height:16px"></div>
+    </div>
+
+    <!-- EMAIL -->
+    <div class="tab-panel" id="panel-email">
+      <div class="info-box" style="border-left:3px solid var(--accent)">
+        <strong>Como configurar (grátis):</strong><br>
+        1. Conta em <strong>emailjs.com</strong><br>
+        2. Add Email Service (Gmail ou Outlook)<br>
+        3. Crie Template com: {{to_email}} {{subject}} {{message}}<br>
+        4. Cole os IDs abaixo
+      </div>
+      <div class="field"><label>Public Key</label><input type="text" id="ejPub" placeholder="user_xxxx"/><small>Account → API Keys</small></div>
+      <div class="field"><label>Service ID</label><input type="text" id="ejSvc" placeholder="service_xxxx"/></div>
+      <div class="field"><label>Template ID</label><input type="text" id="ejTpl" placeholder="template_xxxx"/></div>
+      <div class="divhr"></div>
+      <div class="field"><label>📧 E-mails do time (vírgula)</label><input type="text" id="teamEmails" placeholder="joao@rc.com, maria@rc.com"/></div>
+      <div class="field"><label>🏢 Nome da empresa</label><input type="text" id="companyName" placeholder="RC Scientific"/></div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="btn btna" onclick="saveEmailCfg()" style="flex:1">✓ Salvar</button>
+        <button class="btn" onclick="sendTestEmail()">🧪 Teste</button>
+      </div>
+      <div id="emailMsg" style="font-size:12px;text-align:center;margin-top:10px;min-height:16px"></div>
+    </div>
+
+    <!-- TEXTOS -->
+    <div class="tab-panel" id="panel-txt">
+      <p style="font-size:12.5px;color:var(--text2);margin-bottom:16px;line-height:1.6">Personalize os textos dos e-mails. Use as variáveis entre chaves.</p>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text2);margin-bottom:16px;line-height:1.8">
+        Variáveis: {NOME} {CONTRATO} {DIAS} {DATA} {EMPRESA} {LINK_PIPEDRIVE}
+      </div>
+      <div class="sec-title">E-mail para o CLIENTE</div>
+      <div class="field"><label>Assunto</label><input type="text" id="subjCliente" value="Seu contrato {CONTRATO} está prestes a vencer"/></div>
+      <div class="field"><label>Corpo do e-mail</label>
+        <textarea id="bodyCliente" rows="7">Prezado(a) {NOME},
+
+Gostaríamos de avisar que o contrato {CONTRATO} firmado com {EMPRESA} vence em {DIAS} dia(s), em {DATA}.
+
+Esta é uma ótima oportunidade para renovar e garantir a continuidade dos seus serviços. A renovação antecipada também assegura as condições atuais de preço e disponibilidade de produtos.
+
+Entre em contato conosco o quanto antes para não perder essa oportunidade.
+
+Atenciosamente,
+Equipe {EMPRESA}</textarea>
+      </div>
+      <div class="sec-title">E-mail para o TIME INTERNO</div>
+      <div class="field"><label>Assunto</label><input type="text" id="subjTime" value="[ALERTA] Contrato {CONTRATO} vence em {DIAS} dias"/></div>
+      <div class="field"><label>Corpo do e-mail</label>
+        <textarea id="bodyTime" rows="7">Alerta de vencimento de contrato
+
+Contrato: {CONTRATO}
+Cliente: {NOME}
+Vencimento: {DATA}
+Prazo: {DIAS} dia(s)
+
+Acesse o deal no Pipedrive:
+{LINK_PIPEDRIVE}
+
+—
+LicitaControl · {EMPRESA}</textarea>
+      </div>
+      <button class="btn btna" onclick="saveTexts()" style="width:100%;justify-content:center;margin-top:8px">✓ Salvar Textos</button>
+      <div id="txtMsg" style="font-size:12px;text-align:center;margin-top:10px;min-height:16px"></div>
+    </div>
+
+    <div class="divhr"></div>
+    <div style="text-align:right"><button class="btn" onclick="closeCfg()">Fechar</button></div>
+  </div>
+</div>
+
+<!-- NOTIFY MODAL -->
+<div class="ov" id="notifyModal">
+  <div class="modal">
+    <h2>🔔 Enviar Notificações</h2>
+    <p class="msub" id="notifySub"></p>
+    <div class="sec-title" style="margin-top:0">Selecionar contratos</div>
+    <div class="deal-check-list" id="dealCheckList"></div>
+    <div class="sec-title">Enviar para</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:500">
+        <input type="checkbox" id="chkClient" checked style="accent-color:var(--accent);width:14px;height:14px">
+        📧 Cliente — e-mail da Pessoa no deal
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:500">
+        <input type="checkbox" id="chkTeam" checked style="accent-color:var(--accent);width:14px;height:14px">
+        👥 Time — <span id="teamDisp" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3)"></span>
+      </label>
+    </div>
+    <div id="sendProg" style="display:none">
+      <div class="pbar"><div class="pfill" id="pfill" style="width:0%"></div></div>
+      <div style="font-size:12px;color:var(--text2);text-align:center;margin-bottom:6px" id="ptext"></div>
+      <div class="slog" id="slog"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn btna" onclick="sendNotifications()" id="sendBtn" style="flex:1">📨 Enviar Agora</button>
+      <button class="btn" onclick="document.getElementById('notifyModal').classList.remove('open')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="ov" id="dtModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" id="dtContent"></div>
+</div>
+
+<!-- SETUP VIEW -->
+<div id="setupView">
+  <div class="setup-center">
+    <div class="setup-box">
+      <h2>🏛️ LicitaControl</h2>
+      <p class="sub">Dashboard de vencimentos + notificações automáticas integrado ao seu Pipedrive.</p>
+      <div class="info-box">
+        <strong>Conecta aos funis Licitações Line e Licitações RC Scientific</strong><br>
+        📅 Data de vencimento → campo Data prev. de fechamento (🚩)<br>
+        📋 Nº do contrato → final do título do deal<br>
+        📧 E-mail → Pessoa vinculada ao deal
+      </div>
+      <div class="field">
+        <label>🔑 Pipedrive API Token</label>
+        <input type="password" id="initTok" placeholder="seu token aqui..."/>
+        <small>Pipedrive → ⚙ Configurações pessoais → API</small>
+      </div>
+      <button class="btn btna" onclick="doConnectInit()" style="width:100%;justify-content:center;margin-top:6px;padding:11px;font-size:14px">Conectar →</button>
+      <div id="initMsg" style="font-size:12px;text-align:center;margin-top:10px;min-height:16px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DASH VIEW -->
+<div id="dashView" style="display:none">
+  <div class="wrap">
+    <div id="abanner" style="display:none"></div>
+    <div class="syncbar">
+      <span>🔄</span>
+      <span class="g">Última sync: <span class="mono" id="lastSync">—</span></span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);font-weight:600" id="dcLabel"></span>
+    </div>
+    <div class="stats" id="statsRow"></div>
+    <div class="filter-bar">
+      <div class="fbtns" id="fbtns"></div>
+      <div class="ml" style="display:flex;gap:8px;align-items:center">
+        <div class="sw"><input type="text" id="search" placeholder="buscar..." oninput="render()"></div>
+        <div class="view-toggle">
+          <button class="vt on" id="vt-cards" onclick="setView('cards')" title="Cards">⊞</button>
+          <button class="vt" id="vt-list" onclick="setView('list')" title="Lista">☰</button>
+        </div>
+      </div>
+    </div>
+    <div id="results"></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────
+const DEFAULT_TOKEN = 'eaf874d925a4741442d4b5211ee42a725cc8b37d';
+if(!localStorage.getItem('pd_tk')) localStorage.setItem('pd_tk', DEFAULT_TOKEN);
+
+const S = {
+  get tok(){return ls('pd_tk')}, set tok(v){lss('pd_tk',v)},
+  get ejPub(){return ls('ej_pub')}, set ejPub(v){lss('ej_pub',v)},
+  get ejSvc(){return ls('ej_svc')}, set ejSvc(v){lss('ej_svc',v)},
+  get ejTpl(){return ls('ej_tpl')}, set ejTpl(v){lss('ej_tpl',v)},
+  get teamEmails(){return ls('team_emails')}, set teamEmails(v){lss('team_emails',v)},
+  get companyName(){return ls('company_name')||'RC Scientific'},set companyName(v){lss('company_name',v)},
+  get subjCliente(){return ls('subj_c')||'Seu contrato {CONTRATO} está prestes a vencer'},set subjCliente(v){lss('subj_c',v)},
+  get bodyCliente(){return ls('body_c')||DEFAULT_BODY_C},set bodyCliente(v){lss('body_c',v)},
+  get subjTime(){return ls('subj_t')||'[ALERTA] Contrato {CONTRATO} vence em {DIAS} dias'},set subjTime(v){lss('subj_t',v)},
+  get bodyTime(){return ls('body_t')||DEFAULT_BODY_T},set bodyTime(v){lss('body_t',v)},
+  get notified(){return JSON.parse(ls('notified')||'{}')}, saveNotified(o){lss('notified',JSON.stringify(o))},
+};
+
+const DEFAULT_BODY_C = `Prezado(a) {NOME},\n\nGostaríamos de avisar que o contrato {CONTRATO} firmado com {EMPRESA} vence em {DIAS} dia(s), em {DATA}.\n\nEsta é uma ótima oportunidade para renovar e garantir a continuidade dos seus serviços. A renovação antecipada também assegura as condições atuais de preço e disponibilidade.\n\nEntre em contato conosco o quanto antes para não perder essa oportunidade.\n\nAtenciosamente,\nEquipe {EMPRESA}`;
+const DEFAULT_BODY_T = `Alerta de vencimento de contrato\n\nContrato: {CONTRATO}\nCliente: {NOME}\nVencimento: {DATA}\nPrazo: {DIAS} dia(s)\n\nAcesse o deal no Pipedrive:\n{LINK_PIPEDRIVE}\n\n—\nLicitaControl · {EMPRESA}`;
+
+let deals = [], activeFilter = 'all', viewMode = 'cards';
+
+// ── INIT ─────────────────────────────────────────────────────────────────
+window.onload = () => {
+  loadFormValues();
+  if(S.ejPub){try{emailjs.init(S.ejPub)}catch(e){}; updateEmailBadge(true);}
+  if(S.tok){setConn(true); loadDeals();}
+};
+
+function ls(k){return localStorage.getItem(k)||'';}
+function lss(k,v){localStorage.setItem(k,v);}
+
+function loadFormValues(){
+  el('cfgTok').value=S.tok;
+  el('ejPub').value=S.ejPub; el('ejSvc').value=S.ejSvc; el('ejTpl').value=S.ejTpl;
+  el('teamEmails').value=S.teamEmails; el('companyName').value=S.companyName;
+  el('subjCliente').value=S.subjCliente; el('bodyCliente').value=S.bodyCliente;
+  el('subjTime').value=S.subjTime; el('bodyTime').value=S.bodyTime;
+}
+
+function el(id){return document.getElementById(id);}
+
+// ── SETTINGS ─────────────────────────────────────────────────────────────
+function openCfg(tab){el('cfgModal').classList.add('open');stab(tab||'pd');}
+function closeCfg(){el('cfgModal').classList.remove('open');}
+function stab(t){
+  ['pd','email','txt'].forEach(id=>{
+    el('tab-'+id).classList.toggle('on',id===t);
+    el('panel-'+id).classList.toggle('on',id===t);
+  });
+}
+
+async function doConnect(){await connect(el('cfgTok').value.trim(),el('cfgMsg'),()=>closeCfg());}
+async function doConnectInit(){await connect(el('initTok').value.trim(),el('initMsg'),null);}
+async function connect(tok,msgEl,cb){
+  if(!tok){setMsg(msgEl,'⚠ Informe o token','var(--red)');return;}
+  setMsg(msgEl,'Conectando...','var(--text3)');
+  try{
+    const r=await fetch(`https://api.pipedrive.com/v1/users/me?api_token=${tok}`);
+    const d=await r.json();
+    if(!d.success){setMsg(msgEl,'✗ Token inválido','var(--red)');return;}
+    S.tok=tok; setMsg(msgEl,`✓ Olá, ${d.data.name}!`,'var(--green)'); setConn(true);
+    setTimeout(()=>{if(cb)cb();loadDeals();},700);
+  }catch(e){setMsg(msgEl,'✗ '+e.message,'var(--red)');}
+}
+
+function saveEmailCfg(){
+  S.ejPub=el('ejPub').value.trim(); S.ejSvc=el('ejSvc').value.trim(); S.ejTpl=el('ejTpl').value.trim();
+  S.teamEmails=el('teamEmails').value.trim(); S.companyName=el('companyName').value.trim()||'RC Scientific';
+  if(S.ejPub){try{emailjs.init(S.ejPub)}catch(e){}; updateEmailBadge(true);}
+  setMsg(el('emailMsg'),'✓ Salvo!','var(--green)'); toast('✓ Config de e-mail salva','green');
+}
+
+function saveTexts(){
+  S.subjCliente=el('subjCliente').value; S.bodyCliente=el('bodyCliente').value;
+  S.subjTime=el('subjTime').value; S.bodyTime=el('bodyTime').value;
+  setMsg(el('txtMsg'),'✓ Textos salvos!','var(--green)'); toast('✓ Textos salvos','green');
+}
+
+async function sendTestEmail(){
+  if(!S.ejPub||!S.ejSvc||!S.ejTpl){toast('⚠ Configure EmailJS primeiro','orange');return;}
+  const te=S.teamEmails.split(',')[0]?.trim();
+  if(!te){toast('⚠ Informe ao menos um e-mail do time','orange');return;}
+  setMsg(el('emailMsg'),'🔄 Enviando...','var(--text3)');
+  try{
+    const p=buildParams({nome:'Time Teste',contrato:'SRP 00/2024',dias:5,data:new Date().toLocaleDateString('pt-BR'),link:'https://app.pipedrive.com',isTeam:true});
+    await emailjs.send(S.ejSvc,S.ejTpl,{to_email:te,to_name:'Time',subject:p.subject,message:p.message});
+    setMsg(el('emailMsg'),'✓ Teste enviado!','var(--green)');
+  }catch(e){setMsg(el('emailMsg'),'✗ '+e.text,'var(--red)');}
+}
+
+// ── EMAIL BUILDER ─────────────────────────────────────────────────────────
+function buildParams({nome,contrato,dias,data,link,isTeam,clientEmail}){
+  const replace=(tpl)=>tpl
+    .replace(/{NOME}/g,nome||'').replace(/{CONTRATO}/g,contrato||'')
+    .replace(/{DIAS}/g,dias!=null?String(dias):'').replace(/{DATA}/g,data||'')
+    .replace(/{EMPRESA}/g,S.companyName).replace(/{LINK_PIPEDRIVE}/g,link||'');
+  if(isTeam){
+    return{subject:replace(S.subjTime),message:replace(S.bodyTime)};
+  }else{
+    return{subject:replace(S.subjCliente),message:replace(S.bodyCliente)};
+  }
+}
+
+// ── LOAD ─────────────────────────────────────────────────────────────────
+async function loadDeals(){
+  if(!S.tok){openCfg('pd');return;}
+  const btn=el('syncBtn'); btn.innerHTML='<span class="spin"></span> Carregando...'; btn.disabled=true;
+  try{
+    const pr=await fetch(`https://api.pipedrive.com/v1/pipelines?api_token=${S.tok}`);
+    const pd=await pr.json();
+    const pipes=(pd.data||[]).filter(p=>p.name.toLowerCase().includes('licitaç')||p.name.toLowerCase().includes('licitac'));
+    if(!pipes.length) toast('⚠ Funis "Licitações" não encontrados — carregando todos','orange');
+    let raw=[];
+    const targets=pipes.length?pipes:[{id:null,name:'Todos'}];
+    for(const pipe of targets){
+      let start=0;
+      while(true){
+        let url=`https://api.pipedrive.com/v1/deals?api_token=${S.tok}&status=open&limit=100&start=${start}`;
+        if(pipe.id) url+=`&pipeline_id=${pipe.id}`;
+        const r=await fetch(url); const d=await r.json();
+        if(!d.success||!d.data) break;
+        d.data.forEach(deal=>raw.push({...deal,_pipe:pipe.name}));
+        if(!d.additional_data?.pagination?.more_items_in_collection) break;
+        start+=100;
+      }
+    }
+    const notified=S.notified;
+    deals=raw.map(d=>{
+      const title=d.title||'';
+      return{
+        id:d.id, title,
+        clientName:stripNum(title),
+        contractNum:extractNum(title),
+        org:d.org_name||'',
+        personName:d.person_name||'',
+        email:(d.person_id?.email||[]).find(e=>e.value)?.value||'',
+        value:d.value||0, currency:d.currency||'BRL',
+        closingDate:d.expected_close_date||null,
+        daysLeft:d.expected_close_date?daysUntil(d.expected_close_date):null,
+        pipeline:d._pipe||'',
+        url:`https://app.pipedrive.com/deal/${d.id}`,
+        notified:!!notified[d.id],
+      };
+    });
+    el('lastSync').textContent=new Date().toLocaleTimeString('pt-BR');
+    el('dcLabel').textContent=`${deals.length} contratos`;
+    el('setupView').style.display='none';
+    el('dashView').style.display='block';
+    const urg5=deals.filter(d=>d.daysLeft!==null&&d.daysLeft>=0&&d.daysLeft<=5).length;
+    const exp=deals.filter(d=>d.daysLeft!==null&&d.daysLeft<0).length;
+    el('notifyAllBtn').style.display=(urg5+exp>0)?'flex':'none';
+    showBanner(); renderStats(); buildFilters(); render(); setConn(true);
+    toast(`✓ ${deals.length} contratos carregados`,'green');
+  }catch(e){toast('Erro: '+e.message,'red');}
+  btn.innerHTML='⟳ Sincronizar'; btn.disabled=false;
+}
+
+// ── BANNER ────────────────────────────────────────────────────────────────
+function showBanner(){
+  const exp=deals.filter(d=>d.daysLeft!==null&&d.daysLeft<0);
+  const urg=deals.filter(d=>d.daysLeft!==null&&d.daysLeft>=0&&d.daysLeft<=5);
+  const banner=el('abanner');
+  if(!exp.length&&!urg.length){banner.style.display='none';return;}
+  let parts=[];
+  if(exp.length) parts.push(`<strong>${exp.length} contrato(s) VENCIDO(s)</strong>`);
+  if(urg.length) parts.push(`<strong>${urg.length} contrato(s) vencem em até 5 dias</strong>`);
+  banner.style.display='flex'; banner.className='abanner';
+  banner.innerHTML=`<span style="font-size:20px">🚨</span><span class="grow">${parts.join(' e ')}.</span>${S.ejPub?`<button class="btn btno" onclick="openNotifyModal()" style="flex-shrink:0">🔔 Notificar</button>`:`<button class="btn" onclick="openCfg('email')" style="flex-shrink:0">✉ Config e-mail</button>`}`;
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────
+function renderStats(){
+  const c={vencido:0,urgente:0,atencao:0,ok:0,noemail:0};
+  deals.forEach(d=>{const u=urg(d.daysLeft);if(c[u]!==undefined)c[u]++;if(!d.email)c.noemail++;});
+  el('statsRow').innerHTML=`
+    <div class="sc sv" onclick="setF('vencido')"><div class="sl">Vencidos</div><div class="sn">${c.vencido}</div><div class="ss">expirados</div><div class="bar"></div>${c.vencido>0?'<div class="adot"></div>':''}</div>
+    <div class="sc su" onclick="setF('urgente')"><div class="sl">Crítico</div><div class="sn">${c.urgente}</div><div class="ss">≤ 5 dias</div><div class="bar"></div>${c.urgente>0?'<div class="adot"></div>':''}</div>
+    <div class="sc sa" onclick="setF('atencao')"><div class="sl">Atenção</div><div class="sn">${c.atencao}</div><div class="ss">≤ 30 dias</div><div class="bar"></div></div>
+    <div class="sc so" onclick="setF('ok')"><div class="sl">OK</div><div class="sn">${c.ok}</div><div class="ss">> 30 dias</div><div class="bar"></div></div>
+    <div class="sc sne" onclick="setF('noemail')"><div class="sl">Sem e-mail</div><div class="sn">${c.noemail}</div><div class="ss">sem contato</div><div class="bar"></div></div>
+    <div class="sc st" onclick="setF('all')"><div class="sl">Total</div><div class="sn">${deals.length}</div><div class="ss">contratos</div><div class="bar"></div></div>
+  `;
+}
+
+// ── FILTERS ───────────────────────────────────────────────────────────────
+function counts(){
+  const c={all:deals.length,vencido:0,urgente:0,atencao:0,ok:0,noemail:0};
+  deals.forEach(d=>{const u=urg(d.daysLeft);if(c[u]!==undefined)c[u]++;if(!d.email)c.noemail++;});
+  return c;
+}
+
+function buildFilters(){
+  const c=counts();
+  const fs=[
+    {k:'all',l:'Todos'},
+    {k:'vencido',l:'🔴 Vencidos'},
+    {k:'urgente',l:'🟠 Crítico ≤5d'},
+    {k:'atencao',l:'🟡 Atenção ≤30d'},
+    {k:'ok',l:'🟢 OK'},
+    {k:'noemail',l:'📵 Sem e-mail'},
+  ];
+  el('fbtns').innerHTML=fs.map(f=>`<button class="fb ${activeFilter===f.k?'on':''}" onclick="setF('${f.k}')">${f.l}<span class="cnt">${c[f.k]||0}</span></button>`).join('');
+}
+
+function setF(f){activeFilter=f;renderStats();buildFilters();render();}
+function setView(v){viewMode=v;el('vt-cards').classList.toggle('on',v==='cards');el('vt-list').classList.toggle('on',v==='list');render();}
+
+// ── RENDER ────────────────────────────────────────────────────────────────
+function render(){
+  const q=(el('search')?.value||'').toLowerCase();
+  let list=deals.filter(d=>{
+    if(activeFilter==='noemail') return !d.email;
+    return activeFilter==='all'||urg(d.daysLeft)===activeFilter;
+  });
+  if(q) list=list.filter(d=>[d.title,d.org,d.contractNum||'',d.email,d.personName].join(' ').toLowerCase().includes(q));
+  list.sort((a,b)=>{
+    if(a.daysLeft===null&&b.daysLeft===null)return 0;
+    if(a.daysLeft===null)return 1; if(b.daysLeft===null)return -1;
+    return a.daysLeft-b.daysLeft;
+  });
+  const res=el('results');
+  if(!list.length){res.innerHTML=`<div class="empty"><div class="ei">✅</div><h3>Nenhum contrato aqui</h3><p>Tente outro filtro ou sincronize.</p></div>`;return;}
+  if(viewMode==='cards') renderCards(list,res);
+  else renderTable(list,res);
+}
+
+function renderCards(list,res){
+  res.innerHTML=`<div class="cards-grid">${list.map(d=>cardHtml(d)).join('')}</div>`;
+}
+
+function cardHtml(d){
+  const u=urg(d.daysLeft), tc=tagClass(u), dl=dayLabel(d.daysLeft);
+  const barPct=d.daysLeft===null?0:d.daysLeft<=0?100:Math.max(0,Math.min(100,100-(d.daysLeft/730)*100));
+  const barClr={vencido:'var(--red)',urgente:'var(--orange)',atencao:'var(--yellow)',ok:'var(--green)',nodate:'var(--border2)'}[u];
+  const dateStr=d.closingDate?new Date(d.closingDate+'T12:00:00').toLocaleDateString('pt-BR'):'—';
+  const notifyTs=S.notified[d.id];
+  const client=d.clientName||d.title;
+  return`<div class="card" onclick="openDt(${d.id})">
+    <div class="card-top">
+      <div class="card-badges">
+        <span class="tag ${tc}">${dl}</span>
+        <span class="pipe-tag">${x(d.pipeline)}</span>
+      </div>
+      <button class="card-menu" onclick="event.stopPropagation();quickNotify(${d.id})" title="Notificar">✉</button>
+    </div>
+    <div class="card-title">${x(client)}</div>
+    ${d.contractNum?`<div class="card-num">${x(d.contractNum)}</div>`:``}
+    <div class="progress-strip"><div class="progress-strip-fill" style="width:${barPct}%;background:${barClr}"></div></div>
+    <div class="divider"></div>
+    ${d.org?`<div class="card-row"><span class="icon">🏢</span><span class="val bold">${x(d.org)}</span></div>`:''}
+    ${d.value?`<div class="card-row"><span class="icon">💰</span><span class="val mono">${fmtMoney(d.value,d.currency)}</span></div>`:''}
+    <div class="card-row">
+      <span class="icon">✉</span>
+      ${d.email
+        ?`<span class="val" style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--text2)">${x(d.email)}</span>`
+        :`<span class="no-email-badge">📵 Sem e-mail</span>`
+      }
+    </div>
+    <div class="card-footer">
+      <div class="card-date">📅 ${dateStr}</div>
+      <div class="card-actions">
+        ${d.email&&S.ejPub?`<button class="nbtn ${notifyTs?'sent':''}" onclick="event.stopPropagation();quickNotify(${d.id})">${notifyTs?'✓ Enviado':'✉ Notificar'}</button>`:``}
+        <a class="pdl" href="${d.url}" target="_blank" onclick="event.stopPropagation()">🔗 PD</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderTable(list,res){
+  res.innerHTML=`<div class="tw"><table>
+    <thead><tr><th>Contrato</th><th>E-mail / Contato</th><th>Vencimento</th><th>Prazo</th><th>Valor</th><th>Notif.</th><th></th></tr></thead>
+    <tbody>${list.map(d=>{
+      const u=urg(d.daysLeft),tc=tagClass(u);
+      const notifyTs=S.notified[d.id];
+      const dateStr=d.closingDate?new Date(d.closingDate+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'}):'—';
+      return`<tr onclick="openDt(${d.id})">
+        <td>
+          <div style="font-weight:600;font-size:13px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x(d.clientName||d.title)}</div>
+          ${d.contractNum?`<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);margin-top:2px">${x(d.contractNum)}</div>`:''}
+          <span class="pipe-tag" style="margin-top:3px;display:inline-block">${x(d.pipeline)}</span>
+        </td>
+        <td>${d.email?`<span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text2)">${x(d.email)}</span>`:`<span class="no-email-badge">📵 Sem e-mail</span>`}</td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:12px">${dateStr}</span></td>
+        <td><span class="tag ${tc}">${dayLabel(d.daysLeft)}</span></td>
+        <td><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500">${d.value?fmtMoney(d.value,d.currency):'—'}</span></td>
+        <td>${d.email&&S.ejPub?`<button class="nbtn ${notifyTs?'sent':''}" onclick="event.stopPropagation();quickNotify(${d.id})">${notifyTs?'✓':'✉ Notif.'}</button>`:`<span style="font-size:11px;color:var(--text3)">—</span>`}</td>
+        <td><a class="pdl" href="${d.url}" target="_blank" onclick="event.stopPropagation()">🔗 Abrir</a></td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+}
+
+// ── NOTIFY MODAL ──────────────────────────────────────────────────────────
+function openNotifyModal(){
+  if(!S.ejPub||!S.ejSvc||!S.ejTpl){toast('⚠ Configure EmailJS primeiro','orange');openCfg('email');return;}
+  const urgDeals=deals.filter(d=>d.daysLeft!==null&&d.daysLeft<=30&&d.email);
+  if(!urgDeals.length){toast('Nenhum contrato urgente com e-mail cadastrado','green');return;}
+  const te=S.teamEmails?S.teamEmails.split(',').map(e=>e.trim()).filter(Boolean):[];
+  el('teamDisp').textContent=te.length?te.join(', '):'não configurado';
+  el('notifySub').textContent=`${urgDeals.length} contrato(s) com e-mail e vencendo em até 30 dias:`;
+  el('dealCheckList').innerHTML=urgDeals.map(d=>{
+    const u=urg(d.daysLeft),tc=tagClass(u);
+    return`<div class="dchk"><input type="checkbox" id="chk-${d.id}" value="${d.id}" checked><div class="dchk-info"><div class="dchk-title">${x(d.clientName||d.title)}</div><div class="dchk-sub">${d.contractNum||'—'} · ${d.email}</div></div><span class="tag ${tc}" style="font-size:11px;padding:2px 8px">${dayLabel(d.daysLeft)}</span>${d.notified?'<span style="font-size:14px" title="Já notificado">✅</span>':''}</div>`;
+  }).join('');
+  el('sendProg').style.display='none';
+  el('sendBtn').disabled=false; el('sendBtn').innerHTML='📨 Enviar Agora';
+  el('slog').innerHTML='';
+  el('notifyModal').classList.add('open');
+}
+
+async function sendNotifications(){
+  const checked=[...document.querySelectorAll('#dealCheckList input:checked')].map(c=>+c.value);
+  if(!checked.length){toast('Selecione ao menos um contrato','orange');return;}
+  const toClient=el('chkClient').checked, toTeam=el('chkTeam').checked;
+  const teamEmails=S.teamEmails?S.teamEmails.split(',').map(e=>e.trim()).filter(Boolean):[];
+  const sel=deals.filter(d=>checked.includes(d.id));
+  let tasks=[];
+  sel.forEach(d=>{
+    const ed=d.closingDate?new Date(d.closingDate+'T12:00:00').toLocaleDateString('pt-BR'):'—';
+    const dias=d.daysLeft!=null?d.daysLeft:0;
+    if(toClient&&d.email) tasks.push({d,to:d.email,nome:d.personName||d.clientName,ed,dias,isTeam:false});
+    if(toTeam) teamEmails.forEach(t=>tasks.push({d,to:t,nome:'Time',ed,dias,isTeam:true}));
+  });
+  if(!tasks.length){toast('Nenhum e-mail para enviar','orange');return;}
+  el('sendProg').style.display='block'; el('sendBtn').disabled=true; el('sendBtn').innerHTML='<span class="spin"></span> Enviando...';
+  el('slog').innerHTML=''; let done=0,ok=0,errs=0;
+  for(const t of tasks){
+    el('ptext').textContent=`Enviando ${done+1} de ${tasks.length}...`;
+    try{
+      const p=buildParams({nome:t.nome,contrato:t.d.contractNum||t.d.title,dias:t.dias,data:t.ed,link:t.d.url,isTeam:t.isTeam});
+      await emailjs.send(S.ejSvc,S.ejTpl,{to_email:t.to,to_name:t.nome,subject:p.subject,message:p.message});
+      ok++; addLog('ok',`✓ ${t.isTeam?'Time':'Cliente'} — ${t.to}`);
+      if(!t.isTeam){const n=S.notified;n[t.d.id]=Date.now();S.saveNotified(n);t.d.notified=true;}
+    }catch(e){errs++;addLog('err',`✗ ${t.to}: ${e.text||e.message||'erro'}`);}
+    done++; el('pfill').style.width=`${(done/tasks.length)*100}%`;
+    await sleep(400);
+  }
+  el('ptext').textContent=`Concluído — ${ok} enviado(s)${errs?', '+errs+' erro(s)':''}`;
+  el('sendBtn').innerHTML=`✓ ${ok} enviados`; render();
+  toast(`📨 ${ok} e-mail(s) enviado(s)${errs?' · '+errs+' erro(s)':''}`,errs?'orange':'green');
+}
+
+async function quickNotify(id){
+  if(!S.ejPub||!S.ejSvc||!S.ejTpl){toast('⚠ Configure EmailJS primeiro','orange');openCfg('email');return;}
+  const d=deals.find(dd=>dd.id===id); if(!d)return;
+  const ed=d.closingDate?new Date(d.closingDate+'T12:00:00').toLocaleDateString('pt-BR'):'—';
+  const dias=d.daysLeft!=null?d.daysLeft:0;
+  const te=S.teamEmails?S.teamEmails.split(',').map(e=>e.trim()).filter(Boolean):[];
+  let sent=0;
+  try{
+    if(d.email){
+      const p=buildParams({nome:d.personName||d.clientName,contrato:d.contractNum||d.title,dias,data:ed,link:d.url,isTeam:false});
+      await emailjs.send(S.ejSvc,S.ejTpl,{to_email:d.email,to_name:d.personName||d.clientName,subject:p.subject,message:p.message});
+      sent++;
+    }
+    for(const addr of te){
+      const p=buildParams({nome:d.clientName||d.title,contrato:d.contractNum||d.title,dias,data:ed,link:d.url,isTeam:true});
+      await emailjs.send(S.ejSvc,S.ejTpl,{to_email:addr,to_name:'Time',subject:p.subject,message:p.message});
+      sent++; await sleep(300);
+    }
+    const n=S.notified; n[id]=Date.now(); S.saveNotified(n); d.notified=true;
+    toast(`📨 ${sent} e-mail(s) enviado(s) — ${d.contractNum||d.title}`,'green'); render();
+  }catch(e){toast('✗ Erro: '+(e.text||e.message),'red');}
+}
+
+// ── DETAIL ────────────────────────────────────────────────────────────────
+function openDt(id){
+  const d=deals.find(dd=>dd.id===id); if(!d)return;
+  const u=urg(d.daysLeft),tc=tagClass(u);
+  const dateStr=d.closingDate?new Date(d.closingDate+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}):'—';
+  const notifyTs=S.notified[d.id];
+  el('dtContent').innerHTML=`
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;line-height:1.3;letter-spacing:-.4px">${x(d.title)}</div>
+        <span class="pipe-tag" style="display:inline-block;margin-top:6px">${x(d.pipeline)}</span>
+      </div>
+      <span class="tag ${tc}" style="flex-shrink:0">${dayLabel(d.daysLeft)}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">
+      ${ir('📋 Nº Contrato',d.contractNum||'—')}${ir('🏢 Organização',d.org||'—')}${ir('👤 Contato',d.personName||'—')}${ir('✉ E-mail',d.email||'Sem e-mail')}${ir('📅 Vencimento',dateStr)}${ir('💰 Valor',d.value?fmtMoney(d.value,d.currency):'—')}${ir('🔔 Última notif.',notifyTs?new Date(notifyTs).toLocaleString('pt-BR'):'Nunca')}
+    </div>
+    <div style="display:flex;gap:8px">
+      ${d.email&&S.ejPub?`<button class="btn btnb" onclick="quickNotify(${d.id});document.getElementById('dtModal').classList.remove('open')" style="flex:1">📨 Notificar</button>`:''}
+      <a href="${d.url}" target="_blank" class="btn btna" style="text-decoration:none;flex:1;justify-content:center">🔗 Abrir no Pipedrive</a>
+      <button class="btn" onclick="el('dtModal').classList.remove('open')">Fechar</button>
+    </div>`;
+  el('dtModal').classList.add('open');
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+function daysUntil(ds){const d=new Date(ds+'T12:00:00'),n=new Date();n.setHours(0,0,0,0);return Math.round((d-n)/86400000);}
+function urg(days){if(days===null)return 'nodate';if(days<0)return 'vencido';if(days<=5)return 'urgente';if(days<=30)return 'atencao';return 'ok';}
+function extractNum(t){const m=t.match(/\b(?:PE\s+SRP|SRP|TP|PP|PE|RDC|CV|DL|IL|OPEN)?\s*\d{1,4}[\/\-]\d{4}\b/i);return m?m[0].trim():null;}
+function stripNum(t){return t.replace(/\s*\b(?:PE\s+SRP|SRP|TP|PP|PE|RDC|CV|DL|IL|OPEN)?\s*\d{1,4}[\/\-]\d{4}\b/gi,'').trim();}
+function fmtMoney(v,c){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:c||'BRL'}).format(v);}
+function dayLabel(days){if(days===null)return '— sem data';if(days<0)return `${Math.abs(days)}d vencido`;if(days===0)return 'Vence hoje!';return `${days} dias`;}
+function tagClass(u){return{vencido:'tv',urgente:'tu',atencao:'ta',ok:'to',nodate:'tn'}[u];}
+function ir(label,val){return`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px 12px"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">${label}</div><div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${x(val)}">${x(val)}</div></div>`;}
+function addLog(type,msg){const d=document.createElement('div');d.className='li li-'+type;d.textContent=msg;el('slog').appendChild(d);el('slog').scrollTop=el('slog').scrollHeight;}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function setConn(on){el('cdot').className='dot'+(on?' g':'');el('ctext').textContent=on?'Pipedrive conectado':'Desconectado';}
+function updateEmailBadge(on){el('edot').className='dot'+(on?' b':'');el('etext').textContent=on?'E-mail configurado':'E-mail não config.';}
+function setMsg(el,t,c){if(el){el.style.color=c;el.textContent=t;}}
+function toast(msg,type=''){
+  const colors={green:'var(--green)',red:'var(--red)',orange:'var(--orange)'};
+  const t=document.createElement('div');t.className='toast';
+  if(colors[type])t.style.borderLeft='3px solid '+colors[type];
+  t.textContent=msg;el('toasts').appendChild(t);setTimeout(()=>t.remove(),4000);
+}
+function x(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>
