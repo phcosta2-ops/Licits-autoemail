@@ -85,5 +85,12 @@
     },
     "first_sent_at": "2026-03-29",
     "pd_update_at_first_send": "2026-02-19 11:14:33"
+  },
+  "deal_21679": {
+    "sent": {
+      "5": "2026-03-30"
+    },
+    "first_sent_at": "2026-03-30",
+    "pd_update_at_first_send": "2026-03-27 18:26:59"
   }
 }
