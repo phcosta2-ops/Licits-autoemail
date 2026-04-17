@@ -1,1 +1,30 @@
-
+{
+  "deal_17776": {
+    "sent": {
+      "expired": "2026-04-17"
+    },
+    "first_sent_at": "2026-04-17",
+    "pd_update_at_first_send": "2026-03-31 17:26:52"
+  },
+  "deal_17798": {
+    "sent": {
+      "0": "2026-04-17"
+    },
+    "first_sent_at": "2026-04-17",
+    "pd_update_at_first_send": "2026-03-30 14:13:31"
+  },
+  "deal_21738": {
+    "sent": {
+      "expired": "2026-04-17"
+    },
+    "first_sent_at": "2026-04-17",
+    "pd_update_at_first_send": "2026-04-08 19:24:42"
+  },
+  "deal_21860": {
+    "sent": {
+      "expired": "2026-04-17"
+    },
+    "first_sent_at": "2026-04-17",
+    "pd_update_at_first_send": "2026-04-14 18:53:42"
+  }
+}
