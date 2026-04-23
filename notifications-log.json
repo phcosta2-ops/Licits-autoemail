@@ -63,5 +63,40 @@
     },
     "first_sent_at": "2026-04-22",
     "pd_update_at_first_send": "2026-03-30 14:33:01"
+  },
+  "deal_17097": {
+    "sent": {
+      "30": "2026-04-23"
+    },
+    "first_sent_at": "2026-04-23",
+    "pd_update_at_first_send": "2026-04-08 11:33:26"
+  },
+  "deal_21100": {
+    "sent": {
+      "5": "2026-04-23"
+    },
+    "first_sent_at": "2026-04-23",
+    "pd_update_at_first_send": "2026-04-16 17:34:19"
+  },
+  "deal_21721": {
+    "sent": {
+      "30": "2026-04-23"
+    },
+    "first_sent_at": "2026-04-23",
+    "pd_update_at_first_send": "2026-04-16 19:40:02"
+  },
+  "deal_21746": {
+    "sent": {
+      "5": "2026-04-23"
+    },
+    "first_sent_at": "2026-04-23",
+    "pd_update_at_first_send": "2026-04-16 17:33:16"
+  },
+  "deal_21877": {
+    "sent": {
+      "5": "2026-04-23"
+    },
+    "first_sent_at": "2026-04-23",
+    "pd_update_at_first_send": "2026-04-16 17:33:40"
   }
 }
