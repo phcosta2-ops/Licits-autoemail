@@ -106,5 +106,12 @@
     },
     "first_sent_at": "2026-04-26",
     "pd_update_at_first_send": "2026-04-23 19:36:31"
+  },
+  "deal_21919": {
+    "sent": {
+      "15": "2026-04-27"
+    },
+    "first_sent_at": "2026-04-27",
+    "pd_update_at_first_send": "2026-04-17 13:16:53"
   }
 }
